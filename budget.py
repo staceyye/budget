@@ -2,13 +2,38 @@ import os
 import pandas as pd
 from pandas import ExcelWriter
 import matplotlib.pyplot as plt
+import re
 
 pd.set_option('display.max_columns',4)
-pd.set_option('display.max_rows', None)
+pd.set_option('display.max_rows', 10)
 path="C:\\Users\\yesta\\Desktop"
 os.chdir(path)
 
-df = pd.read_excel("budtest.xlsx", "Sheet2")
+df = pd.read_excel("budget copy.xlsx", "Sheet2")
+
+
+date_pattern = r'([0-9]{4}-[0-9]{2}-[0-9]{2})'
+row1 = df.iloc[:,0]
+#print(row1)
+
+all_dates = {}
+
+first_date = str(df.columns.values[0])[:10]
+all_dates[0] = first_date
+
+i = 0
+j = 1
+for i in range(0, len(row1)):
+    date = re.search(date_pattern, str(row1[i]))
+    if date:
+       # print(date.group())
+        all_dates[j] = date.group()
+        j += 1
+
+for thing in all_dates:
+    print(thing, all_dates[thing])
+
+cycle_dates = {}
 
 offset = 3
 total_cols = (len(df.columns)+1)
@@ -43,11 +68,11 @@ def clean_df(df):
 
 def make_graph(df):
     plot = df.plot.pie(y="amount", labels=df["expense"], autopct='%1.0f%%')
-    plt.show()
+   # plt.show()
 
 df_dict = {}
 i = 1
-writer = pd.ExcelWriter("budtest.xlsx", engine = 'openpyxl', mode='a', if_sheet_exists='overlay')
+writer = pd.ExcelWriter("budget copy.xlsx", engine = 'openpyxl', mode='a', if_sheet_exists='overlay')
 while (i < (no_cycles)+1):
     df1 = df.iloc[0:48, :]
     df1 = df1.drop([20, 24, 45, 46], axis=0)
