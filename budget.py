@@ -11,7 +11,6 @@ os.chdir(path)
 
 df = pd.read_excel("budget copy.xlsx", "Sheet2")
 
-
 date_pattern = r'([0-9]{4}-[0-9]{2}-[0-9]{2})'
 row1 = df.iloc[:,0]
 #print(row1)
@@ -33,7 +32,8 @@ for i in range(0, len(row1)):
 for thing in all_dates:
     print(thing, all_dates[thing])
 
-cycle_dates = {}
+cycle_dates = {int(k/2):v for (k,v) in all_dates.items() if k%2==0}
+print(cycle_dates)
 
 offset = 3
 total_cols = (len(df.columns)+1)
@@ -71,15 +71,15 @@ def make_graph(df):
    # plt.show()
 
 df_dict = {}
-i = 1
+i = 0
 writer = pd.ExcelWriter("budget copy.xlsx", engine = 'openpyxl', mode='a', if_sheet_exists='overlay')
-while (i < (no_cycles)+1):
+while (i < (no_cycles)):
     df1 = df.iloc[0:48, :]
     df1 = df1.drop([20, 24, 45, 46], axis=0)
     df1 = clean_df(df1)
     df_dict[i] = df1
 
-    df1.to_excel(writer, sheet_name = 'cycle' + str(i), index=False)
+    df1.to_excel(writer, sheet_name = cycle_dates[i], index=False)
     make_graph(df1)
 
     df = df.tail(-50)
